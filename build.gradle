@@ -1,0 +1,139 @@
+import groovy.json.JsonOutput
+
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:3.0.197'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+version = '0.2.5'
+group = 'com.playerreinforcements'
+archivesBaseName = 'playerreinforcements'
+sourceCompatibility = targetCompatibility = '1.8'
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.console.level', 'info'
+        }
+        server {
+            workingDirectory project.file('run-server')
+            property 'forge.logging.console.level', 'info'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+def generatedResourcesDir = file("$buildDir/generated/resources")
+def translations = [
+    'playerreinforcements.gui.synchronizing': 'Waiting for server...',
+    'playerreinforcements.gui.cooldown': 'Respawn in %s',
+    'playerreinforcements.gui.ready': 'Ready to respawn',
+    'playerreinforcements.gui.teammates': 'Choose player to spawn on',
+    'playerreinforcements.gui.no_teammates': 'No living teammates',
+    'playerreinforcements.gui.group_wait': 'Respawning together',
+    'playerreinforcements.gui.requesting': 'Respawning...',
+    'playerreinforcements.gui.leave': 'Leave Game',
+    'playerreinforcements.gui.show_games': 'Minigames',
+    'playerreinforcements.gui.hide_games': 'Hide games',
+    'playerreinforcements.gui.dimension.overworld': 'Overworld',
+    'playerreinforcements.gui.dimension.nether': 'The Nether',
+    'playerreinforcements.gui.dimension.end': 'The End',
+    'playerreinforcements.gui.dimension.other': 'Dimension %s',
+    'playerreinforcements.error.target': 'That player is no longer available.',
+    'playerreinforcements.error.location': 'There is no safe space near that player.',
+    'playerreinforcements.minigame.flappy': 'Flappy Cart',
+    'playerreinforcements.minigame.tetris': 'Tetris',
+    'playerreinforcements.minigame.score': 'Score: %s',
+    'playerreinforcements.minigame.top': 'Top',
+    'playerreinforcements.minigame.score_label': 'Score',
+    'playerreinforcements.minigame.high_score': 'HighScore',
+    'playerreinforcements.minigame.choose_game': 'Choose a game above',
+    'playerreinforcements.minigame.game_over': 'Game over',
+    'playerreinforcements.minigame.flappy_ready': 'Flap to start',
+    'playerreinforcements.minigame.flappy_keys': 'Space / W / click to flap',
+    'playerreinforcements.minigame.tetris_keys': 'WASD / Space rotates',
+    'playerreinforcements.minigame.reward': '1 point = 10s less wait',
+    'playerreinforcements.minigame.start': 'Start game',
+    'playerreinforcements.minigame.restart': 'Restart (R)'
+]
+sourceSets.main.resources.srcDir generatedResourcesDir
+// Forge 1.12 uses the directory containing @Mod as its development resource pack.
+sourceSets.main.output.resourcesDir = compileJava.destinationDir
+
+task generateResources {
+    description = 'Generates mod metadata, resource-pack metadata, and English localization.'
+    group = 'build'
+    inputs.property 'modVersion', project.version.toString()
+    inputs.property 'translations', translations
+    outputs.dir generatedResourcesDir
+    doLast {
+        generatedResourcesDir.mkdirs()
+        def metadata = [[
+            modid: 'playerreinforcements',
+            name: 'Player Reinforcements',
+            description: 'Keep your group together when respawning in RLCraft.',
+            version: project.version.toString(),
+            mcversion: '1.12.2',
+            url: '',
+            updateUrl: '',
+            authorList: [],
+            credits: '',
+            logoFile: '',
+            screenshots: [],
+            dependencies: []
+        ]]
+        new File(generatedResourcesDir, 'mcmod.info').setText(
+            JsonOutput.prettyPrint(JsonOutput.toJson(metadata)) + '\n', 'UTF-8')
+        new File(generatedResourcesDir, 'pack.mcmeta').setText(
+            JsonOutput.prettyPrint(JsonOutput.toJson([
+                pack: [description: 'Player Reinforcements resources', pack_format: 3]
+            ])) + '\n', 'UTF-8')
+        def languageFile = new File(generatedResourcesDir, 'assets/playerreinforcements/lang/en_us.lang')
+        languageFile.parentFile.mkdirs()
+        languageFile.setText(translations.collect { key, value -> key + '=' + value }.join('\n') + '\n', 'UTF-8')
+    }
+}
+processResources.dependsOn generateResources, compileJava
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': 'Player Reinforcements',
+            'Specification-Version': '1',
+            'Implementation-Title': 'Player Reinforcements',
+            'Implementation-Version': project.version,
+            'Implementation-Vendor': 'Player Reinforcements'
+        ])
+    }
+}
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+}
