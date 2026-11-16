@@ -48,6 +48,36 @@ public final class MinigameMessageTest {
         assertInvalidInput(-1, 255);
     }
 
+    @Test
+    public void openingAndClosingBothMinigamePanelsRoundTrips() {
+        for (boolean open : new boolean[] {false, true}) {
+            for (boolean waiting : new boolean[] {false, true}) {
+                ByteBuf buffer = Unpooled.buffer();
+                try {
+                    new MinigamePanelMessage(open, waiting).toBytes(buffer);
+                    MinigamePanelMessage result = new MinigamePanelMessage();
+                    result.fromBytes(buffer);
+                    assertEquals(open, result.open);
+                    assertEquals(waiting, result.waiting);
+                    assertEquals(0, buffer.readableBytes());
+                } finally {
+                    buffer.release();
+                }
+            }
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void unknownMinigamePanelFlagsAreRejected() {
+        ByteBuf buffer = Unpooled.buffer();
+        try {
+            buffer.writeByte(4);
+            new MinigamePanelMessage().fromBytes(buffer);
+        } finally {
+            buffer.release();
+        }
+    }
+
     @Test(expected = IndexOutOfBoundsException.class)
     public void incompleteControlsCannotDecodeAsAnAction() {
         ByteBuf buffer = Unpooled.buffer();

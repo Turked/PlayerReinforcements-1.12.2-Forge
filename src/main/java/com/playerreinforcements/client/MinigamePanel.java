@@ -35,6 +35,8 @@ import org.lwjgl.opengl.GL11;
 /** A separate in-screen window that leaves the respawn list and timer visible. */
 @SideOnly(Side.CLIENT)
 public final class MinigamePanel {
+    static final int VERTICAL_MARGIN = 12;
+
     public interface Controls {
         void start(int type);
         void input(int controls);
@@ -75,6 +77,14 @@ public final class MinigamePanel {
 
     public MinigamePanel(Controls controls) {
         this.controls = controls;
+    }
+
+    static int widthForScreen(int screenWidth) {
+        return Math.min(220, (screenWidth - 24) / 2);
+    }
+
+    static int heightForScreen(int screenHeight) {
+        return screenHeight - 2 * VERTICAL_MARGIN;
     }
 
     public void setBounds(int left, int top, int width, int height) {

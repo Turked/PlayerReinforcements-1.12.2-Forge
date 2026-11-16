@@ -71,7 +71,7 @@ public final class ReinforcementDeathScreen extends GuiScreen {
         public void start(int type) {
             if (mc.getConnection() != null) {
                 minigameAudio.startRequested();
-                PlayerReinforcements.NETWORK.sendToServer(new MinigameInputMessage(type, 0));
+                ClientState.startMinigame(type);
             }
         }
 
@@ -122,10 +122,11 @@ public final class ReinforcementDeathScreen extends GuiScreen {
         roster.clear();
         if (showsGames()) {
             int available = Math.min(508, width - 16);
-            int gameWidth = Math.min(220, (available - 8) / 2);
+            int gameWidth = MinigamePanel.widthForScreen(width);
             panelWidth = available - 8 - gameWidth;
             panelLeft = (width - available) / 2;
-            minigame.setBounds(panelLeft + panelWidth + 8, 12, gameWidth, height - 24);
+            minigame.setBounds(panelLeft + panelWidth + 8, MinigamePanel.VERTICAL_MARGIN,
+                    gameWidth, MinigamePanel.heightForScreen(height));
         } else {
             panelWidth = Math.max(100, Math.min(280, width - 32));
             panelLeft = (width - panelWidth) / 2;
@@ -261,7 +262,11 @@ public final class ReinforcementDeathScreen extends GuiScreen {
         }
         if (button.id == MINIGAMES) {
             gamesOpen = !gamesOpen;
-            if (!gamesOpen) minigameAudio.stop(mc);
+            if (gamesOpen) {
+                ClientState.openMinigames(true);
+            } else {
+                minigameAudio.stop(mc);
+            }
             rebuildButtons();
         } else if (button.id == LEAVE) {
             GuiYesNo confirmation = new LeaveConfirmation(this);

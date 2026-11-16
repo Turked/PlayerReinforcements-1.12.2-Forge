@@ -1,10 +1,10 @@
-Player Reinforcements 0.2.5
+Player Reinforcements 1.0.1
 Minecraft 1.12.2 / Forge 14.23.5.2860 / RLCraft 2.9.3
 
 Install
 -------
 Build with Java 8 using gradlew.bat build. Install the resulting
-build/libs/playerreinforcements-0.2.5.jar in the mods folder on the server
+build/libs/playerreinforcements-1.0.1.jar in the mods folder on the server
 and on every client. This mod adds a networked death screen and is required
 on both sides. Update the server and every client to the same version.
 Keep the RLCraft modpack's existing mods and configuration.
@@ -18,11 +18,16 @@ On a player's first join, group mode places them safely beside an existing
 living real player. The first player uses the normal world spawn. Returning
 players keep their saved location. Existing world player files are recognized.
 
-If a teammate is alive after you die, wait two minutes (2400 server ticks),
-then click their name on the death screen to respawn nearby. The server checks
-the cooldown and the teammate's current state. The screen uses Minecraft's
-font, buttons, death-screen gradient, and GUI scaling. Long teammate lists
-use a scrollable list with a draggable scrollbar, the mouse wheel, and
+After you die, a usable personal spawnpoint sends you there immediately.
+Beds, waystones, and command-set spawnpoints follow Forge/RLCraft's normal
+respawn rules. If your personal spawnpoint becomes unusable and the game
+would use world spawn, teammate respawning becomes available again.
+
+If the game would use world spawn and a teammate is alive, wait two minutes
+(2400 server ticks), then click their name on the death screen to respawn
+nearby. The server checks the cooldown and the teammate's current state.
+The screen uses Minecraft's font, buttons, death-screen gradient, and GUI
+scaling. Scroll long teammate lists with the scrollbar, mouse wheel,
 Up/Down, Page Up/Page Down, or Home/End.
 Teammate dimensions are hidden by default. Every teammate button includes
 their skin's face and hat icon, with a default Steve/Alex face while loading.
@@ -38,14 +43,11 @@ server; they do not join the real connection list or persist as saved players.
 Dead dummies stay dead until the group wipes; then all three return beside the
 group's normal respawn destination. Set testDummies=false for normal solo play.
 
-If no teammates are alive, the group respawns immediately, bypassing all
-remaining cooldowns. Solo players with no living dummies also respawn
-immediately after death.
-One player's normal Forge/RLCraft respawn
-chooses the shared destination, then the others respawn nearby. RLCraft's
-random respawn radius remains in effect. Normal valid bed/waystone rules
-for that first player remain in effect too. No new spawnpoint is written.
-Players in other dimensions can rejoin the living teammate's dimension.
+If no teammates are alive, players who would use world spawn skip the
+cooldown and respawn together. One player's normal Forge/RLCraft world-spawn
+fallback sets the shared destination, including RLCraft's random respawn
+radius. Anyone with a usable personal spawnpoint respawns there. Respawning
+near a teammate can take you to their dimension.
 
 Waiting state and cooldown deadlines are saved in the overworld's data.
 Disconnecting does not clear the state or restart the cooldown. Time
@@ -69,33 +71,39 @@ config/playerreinforcements.cfg is created on first launch:
   respawnCooldown = 2
   respawnCooldownUnit = MINUTES
 
+Usable personal spawnpoints take effect automatically. The
+enableRespawningOnSpawnpoint entry is reserved for a death-screen button.
+
 Set showTeammateDimensions=true on the server to display teammate
 dimensions before spawning. This option supports both true and false;
 the server controls the display for every client. When false, the server
 also leaves teammate dimensions out of the status packets.
 
-Test dummies and death minigames support both true and false. Click Minigames
-to open a panel beside the death screen. The timer and teammate list stay
-visible even at Minecraft's minimum GUI size. Choose Flappy Cart or Tetris
-using the tabs, and use Restart (R) to start again. Flappy Cart starts on the
-first flap. Press Space, W, or Up, or click the playfield to flap. Each
-obstacle passed earns one point. In Tetris use A/D or Left/Right to move,
-W, Space, or Up to rotate, S or Down to drop faster, and Enter to drop
-immediately. Each completed line earns 10 points. Click a game to focus its
-keyboard controls. Page Up/Page Down always scroll the teammate list.
+Test dummies and minigames support both true and false. With
+enableDeathMinigames=true, click Minigames beside Open to LAN in the Game Menu
+or on the death screen while waiting. The world keeps ticking while the
+minigames screen is open, including in single-player. On the death screen,
+the timer and teammate list stay visible even at Minecraft's minimum GUI
+size. Choose Flappy Cart or Tetris using the tabs, and use Restart (R) to
+start again. Flappy Cart starts on the first flap. Press Space, W, or Up,
+or click the playfield to flap. Each obstacle passed earns one point. In
+Tetris use A/D or Left/Right to move, W, Space, or Up to rotate, S or Down
+to drop faster, and Enter to drop immediately. Each completed line earns
+10 points. Click a game to focus its keyboard controls. Page Up/Page Down
+always scrolls the teammate list.
 
 Flappy Cart plays Cat and Tetris plays Blocks through the Music slider.
 The soundtrack stops when the game ends or you leave the panel. Minecraft
 sound effects mark game selection, flaps, block moves, and scores.
-Losing plays a short descending note. HighScore is your best run in that game,
-and Top shows the world record holder's face and score. Records are saved
-per game in the world data and include offline players.
+Losing plays a short descending note. Opening Minigames loads your best run
+and the world's top player and score for each game. Both screens use the
+same records, saved in the world data for online and offline players.
 
 Set minigameReducesRespawnTimer=true to remove 10 seconds (200 server ticks)
-per earned point. The server simulates the games and awards points.
+per point earned on the death screen. The server simulates the games and
+awards points.
 Restarting or switching games does not award old points again. Reductions
 only affect your own remaining timer and never bypass selecting a living teammate.
-With the default false, minigames are just something to play while waiting.
 
 Changing any unsupported setting stops loading with:
   error - not implemented yet: <setting>

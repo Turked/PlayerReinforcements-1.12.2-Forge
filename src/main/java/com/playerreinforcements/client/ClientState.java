@@ -1,5 +1,8 @@
 package com.playerreinforcements.client;
 
+import com.playerreinforcements.PlayerReinforcements;
+import com.playerreinforcements.network.MinigameInputMessage;
+import com.playerreinforcements.network.MinigamePanelMessage;
 import com.playerreinforcements.network.StatusMessage;
 import com.playerreinforcements.network.MinigameStateMessage;
 import com.playerreinforcements.network.MinigameScoresMessage;
@@ -16,6 +19,9 @@ public final class ClientState {
     private static long clientTicks;
     private static long receivedTick;
     private static int revision;
+    private static boolean minigamesOpen;
+    private static boolean minigamesWhileWaiting;
+    private static boolean minigameRequested;
     private static MinigameSession minigame;
     private static final MinigameScoresMessage[] highScores = {
             new MinigameScoresMessage(), new MinigameScoresMessage()
@@ -26,7 +32,9 @@ public final class ClientState {
 
     public static void receive(StatusMessage message) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (!message.waiting || !status.waiting || !message.deathMinigamesEnabled) minigame = null;
+            if (minigamesOpen && (!message.deathMinigamesEnabled || message.waiting != minigamesWhileWaiting)) {
+                clearMinigames();
+            }
             status = message;
             serverActive = true;
             receivedTick = clientTicks;
@@ -40,14 +48,45 @@ public final class ClientState {
 
     public static void receiveMinigame(MinigameStateMessage message) {
         Minecraft.getMinecraft().addScheduledTask(() -> {
-            if (status.waiting && status.deathMinigamesEnabled) {
-                minigame = message.session;
-                Minecraft mc = Minecraft.getMinecraft();
-                if (mc.currentScreen instanceof ReinforcementDeathScreen) {
-                    ((ReinforcementDeathScreen) mc.currentScreen).onMinigameSnapshot(minigame);
-                }
+            if (!minigamesOpen || !minigameRequested) return;
+            minigame = message.session;
+            Minecraft mc = Minecraft.getMinecraft();
+            if (minigamesWhileWaiting && mc.currentScreen instanceof ReinforcementDeathScreen) {
+                ((ReinforcementDeathScreen) mc.currentScreen).onMinigameSnapshot(minigame);
+            } else if (!minigamesWhileWaiting && mc.currentScreen instanceof MinigamesScreen) {
+                ((MinigamesScreen) mc.currentScreen).onMinigameSnapshot(minigame);
             }
         });
+    }
+
+    static void openMinigames(boolean waiting) {
+        if (Minecraft.getMinecraft().getConnection() == null || (minigamesOpen && minigamesWhileWaiting == waiting)) {
+            return;
+        }
+        clearMinigames();
+        minigamesOpen = true;
+        minigamesWhileWaiting = waiting;
+        PlayerReinforcements.NETWORK.sendToServer(new MinigamePanelMessage(true, waiting));
+    }
+
+    static void closeMinigames(boolean waiting) {
+        if (!minigamesOpen || minigamesWhileWaiting != waiting) return;
+        clearMinigames();
+        if (Minecraft.getMinecraft().getConnection() != null) {
+            PlayerReinforcements.NETWORK.sendToServer(new MinigamePanelMessage(false, waiting));
+        }
+    }
+
+    static void startMinigame(int type) {
+        if (!minigamesOpen || Minecraft.getMinecraft().getConnection() == null) return;
+        minigameRequested = true;
+        PlayerReinforcements.NETWORK.sendToServer(new MinigameInputMessage(type, 0));
+    }
+
+    private static void clearMinigames() {
+        minigamesOpen = false;
+        minigameRequested = false;
+        minigame = null;
     }
 
     public static MinigameSession getMinigame() {
@@ -78,7 +117,7 @@ public final class ClientState {
         clientTicks = 0;
         receivedTick = 0;
         revision++;
-        minigame = null;
+        clearMinigames();
         highScores[0] = new MinigameScoresMessage();
         highScores[1] = new MinigameScoresMessage();
     }

@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.2.5'
+version = '1.0.1'
 group = 'com.playerreinforcements'
 archivesBaseName = 'playerreinforcements'
 sourceCompatibility = targetCompatibility = '1.8'

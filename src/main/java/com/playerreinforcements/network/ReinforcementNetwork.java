@@ -14,5 +14,6 @@ public final class ReinforcementNetwork {
         PlayerReinforcements.NETWORK.registerMessage(MinigameInputMessage.Handler.class, MinigameInputMessage.class, 3, Side.SERVER);
         PlayerReinforcements.NETWORK.registerMessage(MinigameStateMessage.Handler.class, MinigameStateMessage.class, 4, Side.CLIENT);
         PlayerReinforcements.NETWORK.registerMessage(MinigameScoresMessage.Handler.class, MinigameScoresMessage.class, 5, Side.CLIENT);
+        PlayerReinforcements.NETWORK.registerMessage(MinigamePanelMessage.Handler.class, MinigamePanelMessage.class, 6, Side.SERVER);
     }
 }

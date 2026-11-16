@@ -18,13 +18,14 @@ public final class ReinforcementsConfig {
         boolean spectate = config.getBoolean("enableSpectate", "general", false, "Not implemented yet. Default: false.");
         boolean stratagems = config.getBoolean("enableStratagems", "general", false, "Not implemented yet. Default: false.");
         boolean timer = config.getBoolean("enableRespawnTimer", "general", true, "Default: true. Other values are not implemented yet.");
-        boolean spawnpoint = config.getBoolean("enableRespawningOnSpawnpoint", "general", false, "Not implemented yet. Default: false.");
+        boolean spawnpoint = config.getBoolean("enableRespawningOnSpawnpoint", "general", false,
+                "Reserved for a death-screen spawnpoint button. Usable personal spawnpoints already respawn automatically. Default: false.");
         boolean dimensions = config.getBoolean("showTeammateDimensions", "general", false,
                 "Show teammate dimensions on the death screen. Server-controlled; default: false.");
         boolean dummies = config.getBoolean("testDummies", "general", false,
                 "Test dummies: spawn three attackable fake players for solo testing: stationary, follower, and random runner. Default: false. Restart the server after changing.");
         boolean minigames = config.getBoolean("enableDeathMinigames", "general", true,
-                "Offer Flappy Cart and Minecraft-themed Tetris beside the death screen while waiting to respawn. Default: true. Restart the server after changing.");
+                "Offer Flappy Cart and Minecraft-themed Tetris from the Game Menu and while waiting to respawn. Default: true. Restart the server after changing.");
         boolean reduction = config.getBoolean("minigameReducesRespawnTimer", "general", false,
                 "Each server-verified minigame point removes 10 seconds from the player's remaining respawn timer. Requires enableDeathMinigames. Default: false. Restart the server after changing.");
         String mode = config.getString("respawnMode", "general", "GROUP_RESPAWN", "Only GROUP_RESPAWN is implemented.");
