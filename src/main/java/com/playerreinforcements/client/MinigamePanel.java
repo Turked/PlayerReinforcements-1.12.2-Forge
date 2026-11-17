@@ -189,7 +189,8 @@ public final class MinigamePanel {
 
     public boolean keyTyped(char typedChar, int keyCode) {
         if (!focused || session == null) return false;
-        if (keyCode == Keyboard.KEY_R) {
+        if (keyCode == Keyboard.KEY_R
+                || (keyCode == Keyboard.KEY_SPACE && session.gameOver() && !Keyboard.isRepeatEvent())) {
             controls.start(session.type());
             return true;
         }
@@ -253,9 +254,14 @@ public final class MinigamePanel {
                 centerTrimmed(font, text("flappy_ready", "Flap to start"), hintTop + 5, 0xFFFF77);
             }
         }
-        boolean tetris = session != null && session.type() == MinigameSession.TETRIS;
-        String keys = tetris ? text("tetris_keys", "WASD / Space rotates")
-                : text("flappy_keys", "Space / W / click to flap");
+        String keys;
+        if (session != null && session.gameOver()) {
+            keys = text("restart_key", "Space to restart");
+        } else if (session != null && session.type() == MinigameSession.TETRIS) {
+            keys = text("tetris_keys", "WASD / Space rotates");
+        } else {
+            keys = text("flappy_keys", "Space / W / click to flap");
+        }
         centerTrimmed(font, keys, top + height - 43, 0xDDDDDD);
         if (timerReduction) {
             centerTrimmed(font, text("reward", "1 point = 10s less wait"), top + height - 32, 0xAADD99);

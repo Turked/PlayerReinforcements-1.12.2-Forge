@@ -1,10 +1,10 @@
-Player Reinforcements 1.0.1
+Player Reinforcements 1.0.2
 Minecraft 1.12.2 / Forge 14.23.5.2860 / RLCraft 2.9.3
 
 Install
 -------
 Build with Java 8 using gradlew.bat build. Install the resulting
-build/libs/playerreinforcements-1.0.1.jar in the mods folder on the server
+build/libs/playerreinforcements-1.0.2.jar in the mods folder on the server
 and on every client. This mod adds a networked death screen and is required
 on both sides. Update the server and every client to the same version.
 Keep the RLCraft modpack's existing mods and configuration.
@@ -28,7 +28,9 @@ If the game would use world spawn and a teammate is alive, wait two minutes
 nearby. The server checks the cooldown and the teammate's current state.
 The screen uses Minecraft's font, buttons, death-screen gradient, and GUI
 scaling. Scroll long teammate lists with the scrollbar, mouse wheel,
-Up/Down, Page Up/Page Down, or Home/End.
+Up/Down, Page Up/Page Down, or Home/End. Press Escape to open the Game Menu
+while the countdown keeps running. Escape or Back to Game returns to the
+respawn screen while you are still waiting.
 Teammate dimensions are hidden by default. Every teammate button includes
 their skin's face and hat icon, with a default Steve/Alex face while loading.
 
@@ -85,7 +87,8 @@ or on the death screen while waiting. The world keeps ticking while the
 minigames screen is open, including in single-player. On the death screen,
 the timer and teammate list stay visible even at Minecraft's minimum GUI
 size. Choose Flappy Cart or Tetris using the tabs, and use Restart (R) to
-start again. Flappy Cart starts on the first flap. Press Space, W, or Up,
+start again. Press Space after a loss to restart the same game. Flappy Cart
+starts on the first flap. Press Space, W, or Up,
 or click the playfield to flap. Each obstacle passed earns one point. In
 Tetris use A/D or Left/Right to move, W, Space, or Up to rotate, S or Down
 to drop faster, and Enter to drop immediately. Each completed line earns

@@ -348,7 +348,8 @@ public final class ReinforcementManager {
         MinigameRun run = viewer.run;
         if (startType >= 0) {
             // Bound reset requests; a reset never awards or re-awards any points.
-            if (run != null && now() - run.startedAt < 10) return;
+            if (run != null && now() - run.startedAt < 10
+                    && (startType != run.session.type() || !run.session.gameOver())) return;
             run = new MinigameRun(new MinigameSession(startType, player.getServerWorld().rand.nextLong()), now());
             viewer.run = run;
         }

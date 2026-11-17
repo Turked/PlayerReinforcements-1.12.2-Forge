@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.1'
+version = '1.0.2'
 group = 'com.playerreinforcements'
 archivesBaseName = 'playerreinforcements'
 sourceCompatibility = targetCompatibility = '1.8'
@@ -76,6 +76,7 @@ def translations = [
     'playerreinforcements.minigame.tetris_keys': 'WASD / Space rotates',
     'playerreinforcements.minigame.reward': '1 point = 10s less wait',
     'playerreinforcements.minigame.start': 'Start game',
+    'playerreinforcements.minigame.restart_key': 'Space to restart',
     'playerreinforcements.minigame.restart': 'Restart (R)'
 ]
 sourceSets.main.resources.srcDir generatedResourcesDir

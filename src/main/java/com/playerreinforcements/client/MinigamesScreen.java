@@ -46,7 +46,8 @@ public final class MinigamesScreen extends GuiScreen {
     }
 
     static boolean isAvailable() {
-        return ClientState.isServerActive() && ClientState.getStatus().deathMinigamesEnabled;
+        return ClientState.isServerActive() && ClientState.getStatus().deathMinigamesEnabled
+                && !ClientState.getStatus().waiting;
     }
 
     static String title() {

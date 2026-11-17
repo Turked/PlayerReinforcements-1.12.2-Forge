@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.UUID;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -106,6 +107,7 @@ public final class ReinforcementDeathScreen extends GuiScreen {
     public void initGui() {
         guiScale = new ScaledResolution(mc).getScaleFactor();
         dragOffset = -1;
+        if (ClientState.getRevision() != lastRevision) requestPending = false;
         rebuildButtons();
     }
 
@@ -336,6 +338,10 @@ public final class ReinforcementDeathScreen extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_ESCAPE) {
+            mc.displayGuiScreen(new RespawnPauseMenu(this));
+            return;
+        }
         if (showsGames() && minigame.keyTyped(typedChar, keyCode)) return;
         switch (keyCode) {
             case Keyboard.KEY_UP: scrollBy(-rowHeight); break;
@@ -524,6 +530,38 @@ public final class ReinforcementDeathScreen extends GuiScreen {
     @Override
     public boolean doesGuiPauseGame() {
         return false;
+    }
+
+    private static final class RespawnPauseMenu extends GuiIngameMenu {
+        private static final int BACK_TO_GAME = 4;
+        private final ReinforcementDeathScreen respawnScreen;
+
+        RespawnPauseMenu(ReinforcementDeathScreen respawnScreen) {
+            this.respawnScreen = respawnScreen;
+        }
+
+        @Override
+        protected void keyTyped(char typedChar, int keyCode) throws IOException {
+            if (keyCode == Keyboard.KEY_ESCAPE && ClientState.getStatus().waiting) {
+                mc.displayGuiScreen(respawnScreen);
+                return;
+            }
+            super.keyTyped(typedChar, keyCode);
+        }
+
+        @Override
+        protected void actionPerformed(GuiButton button) throws IOException {
+            if (button.id == BACK_TO_GAME && ClientState.getStatus().waiting) {
+                if (button.enabled) mc.displayGuiScreen(respawnScreen);
+                return;
+            }
+            super.actionPerformed(button);
+        }
+
+        @Override
+        public boolean doesGuiPauseGame() {
+            return !ClientState.getStatus().waiting && super.doesGuiPauseGame();
+        }
     }
 
     static final class LeaveConfirmation extends GuiYesNo {
